@@ -97,7 +97,7 @@ webpack.config
 
 ````json
 module.exports = {
- //...
+/*...*/
   	module: {
 		rules: [{
 			test: /\.js$/,
@@ -158,6 +158,10 @@ In 'package.json':
 ````
 
 then: `npm run dev` / http://localhost:8080/ 
+
+
+
+
 
 
 
