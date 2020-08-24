@@ -93,11 +93,10 @@ npm install --save-dev @babel/core @babel/register @babel/preset-env babel-loade
 npm install --save  @babel/polyfill
 ````
 
-webpack.config
+webpack.config.js
 
 ````json
 module.exports = {
-/*...*/
   	module: {
 		rules: [{
 			test: /\.js$/,
