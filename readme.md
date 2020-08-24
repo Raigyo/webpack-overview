@@ -97,7 +97,7 @@ webpack.config
 
 ````json
 module.exports = {
- //****
+ //...
   	module: {
 		rules: [{
 			test: /\.js$/,
