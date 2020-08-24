@@ -108,7 +108,6 @@ module.exports = {
   }
 }
 ````
-
 .babelrc.json
 
 ````json
@@ -126,7 +125,23 @@ module.exports = {
 
 ### Plugins
 
-#### HtmlWebpackPlugin:
+#### [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/)
+
+*Minify code*
+
+`npm i uglifyjs-webpack-plugin --save-dev`
+
+It's generally a good practice to minify and combine your assets (Javascript & CSS) when deploying to production. This process reduces the size of your assets and dramatically improves your website's load time. Source maps create a map from these compressed asset files back to the source files.
+
+Whe will use **Devtool**  to control if and how source maps are generated.
+
+For instance in *webpack.config.js:* `devtool: dev ? "eval-cheap-module-source-map" : "source-map",`
+
+In th browser, disable 'Enable JS source maps'.
+
+Then we can use `console.log` and `debugger`even with the minified build files.
+
+#### [HtmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin/)
 
 *The HtmlWebpackPlugin simplifies creation of HTML files to serve your webpack bundles.*
 
@@ -183,6 +198,10 @@ then: `npm run dev` / http://localhost:8080/
 [Les outils pour travailler côté front](https://bts-sio-formation.com/javascript/developpementfront)
 
 [Working with Babel 7 and Webpack](https://www.thebasement.be/working-with-babel-7-and-webpack/)
+
+[Devtool](https://webpack.js.org/configuration/devtool/)
+
+[What are Javascript Source Maps?](https://blog.rapid7.com/2017/05/24/what-are-javascript-source-maps/)
 
 [Comprendre WebAssembly en 5 minutes](https://www.jesuisundev.com/comprendre-webassembly-en-5-minutes/)
 

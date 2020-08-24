@@ -8,6 +8,8 @@ import '@babel/polyfill'
 log(hello(config.name));// Output: Hello Vincent
 log("config.cache: "+config.cache); // Output: config.cache:true
 
+
+
 //Exemple of Babel converting let to var in main.js
 let a = "people!"
 log(hello(a))// Output: Hello people!
