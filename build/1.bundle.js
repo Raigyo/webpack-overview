@@ -1,6 +1,10 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[1],{
 
-/***/ 36:
+/***/ "./src/test.wasm":
+/*!***********************!*\
+  !*** ./src/test.wasm ***!
+  \***********************/
+/*! exports provided: memory, _Z5add42i */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

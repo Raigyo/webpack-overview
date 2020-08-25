@@ -64,8 +64,6 @@ Then:
 
 NB: it's not a good practise to install it globally.
 
-
-
 Will create a 'dist' folder:
 
 ```diff
@@ -78,11 +76,71 @@ Will create a 'dist' folder:
 +   |- index.js
 ```
 
+## Techniques
+
+#### Lazy Loading / Code splitting
+
+Allows deferred loading for some file to improve performances or if we don't always need a component. This practice essentially involves splitting your code at logical breakpoints, and then loading it once the user has done something that requires, or will require, a new block of code. This speeds up the initial load of the application and lightens its overall weight as some blocks may never even be loaded.
+
+Use this plugin for dynamic imports:
+
+`npm i -D babel-plugin-syntax-dynamic-import`
+
+In .babelrc.json:
+
+````json
+{
+	"presets": [
+		["@babel/preset-env", {
+			"useBuiltIns": "entry",
+			"modules": false,
+			"debug":true
+		}]
+	],
+	"plugins": ["syntax-dynamic-import"]
+}
+````
+
+Exemple with an external component displaying a console log:
+
+index.js
+
+````js
+document.getElementById('button').addEventListener('click', function () {
+  //Async promise
+  import('./print').then(module => {
+  const print = module.default;
+  print();
+  })
+})
+````
+
+print.js
+
+````
+console.log('The print.js module has loaded! See the network tab in dev tools...');
+
+export default () => {
+  console.log('Button Clicked: Here\'s "some text"!');
+};
+````
+
+Another exemple that display Web Assembly in client console:
+
+````js
+import('./test.wasm').then(function (module) {
+  //wasm script to add a number to 42
+ log(module._Z5add42i(20))// Output: 62
+}).catch(console.log)
+````
+
 
 
 ## Packages
 
-### Modules
+### Modules / Loaders
+
+Webpack enables use of [loaders](https://webpack.js.org/loaders/) to preprocess files. This allows you to bundle any static resource way beyond JavaScript. 
 
 #### Babel: [babel-loader](https://webpack.js.org/loaders/babel-loader/)
 
@@ -121,19 +179,141 @@ module.exports = {
 }
 ````
 
+#### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/), [postcss-loader](https://webpack.js.org/loaders/postcss-loader/)
+
+**Css loader**: convert css to strings
+
+`npm install --save-dev css-loader`
+
+**Style loader**: inject strings into style tags
+
+`npm install --save-dev style-loader`
+
+**Sass loader** and node-sass: to use css preprocessor, here sass to css
+
+`npm install --save-dev sass-loader node-sass`
+
+webpack.config.js
+
+````js
+	module: {
+        rules: [
+          {
+            test: /\.css$/i,
+            use: ['style-loader', 'css-loader'],
+            //loader on the right loaded first, respect the logical order
+          },
+          {
+            test: /\.scss$/i,
+            use: ['style-loader', 'css-loader', 'sass-loader'],
+          }
+        ]
+  }
+````
+
+app.scss
+
+````scss
+$background: #DDD;
+
+body {
+    background: $background;
+}
+````
+
+index.js, import scss
+
+````js
+import css from './app.scss'
+````
+
+SCSS will be automaticaly conver tinto CSS.
+
+#### Postprocessor CSS (PostCSS): [postcss-loader](https://webpack.js.org/loaders/postcss-loader/)
+
+**PostCSS loader** : a CSS post-processing tool that can transform your CSS in a lot of  ways, like autoprefixing, linting and more!
+
+`npm i -D postcss-loader`
+
+If you use plugins, you have to install them.
+
+Exemple:
+
+postcss-preset-env: `npm i postcss-preset-env`
+
+css nano: `npm i cssnano`
+
+webpack.config.js
+
+````js
+      {
+        test: /\.scss$/i,
+        //use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: [
+          'style-loader',
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          { loader: 'postcss-loader',
+            options: {
+              plugins: (loader) => [
+                require('postcss-preset-env')({
+                  browsers: "last 2 versions",
+                  stage: 3,
+                  features: {
+                    "nesting-rules": true
+                  }
+                }),
+                require('cssnano')(),
+              ],
+            }
+          },
+          'sass-loader'
+        ],
+      }
+````
+
+or with an external config file:
+
+webpack.config.js
+
+````
+      {
+        test: /\.scss$/i,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      }
+````
+
+postcss.config.js
+
+````
+module.exports = {
+  plugins: {
+    'postcss-preset-env': {
+      browsers: 'last 2 versions',
+      stage: 3,
+      features: {
+        "nesting-rules": true
+      }
+    },
+    cssnano: {},
+  },
+};
+````
+
 
 
 ### Plugins
 
-#### [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/)
+Webpack has a rich [plugin](https://webpack.js.org/plugins/) interface. Most of the features within webpack itself use this plugin interface. This makes webpack flexible.
+
+#### [TerserWebpackPlugin](https://webpack.js.org/plugins/terser-webpack-plugin/)
 
 *Minify code*
 
-`npm i uglifyjs-webpack-plugin --save-dev`
+`npm i terser-webpack-plugin --save-dev`
 
 It's generally a good practice to minify and combine your assets (Javascript & CSS) when deploying to production. This process reduces the size of your assets and dramatically improves your website's load time. Source maps create a map from these compressed asset files back to the source files.
 
-Whe will use **Devtool**  to control if and how source maps are generated.
+Whe will use [**Devtool**](https://webpack.js.org/configuration/devtool/)  to control if and how **source maps** are generated.
 
 For instance in *webpack.config.js:* `devtool: dev ? "eval-cheap-module-source-map" : "source-map",`
 
@@ -141,25 +321,33 @@ In th browser, disable 'Enable JS source maps'.
 
 Then we can use `console.log` and `debugger`even with the minified build files.
 
+Warning: [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) is deprecated
+
 #### [HtmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin/)
 
 *The HtmlWebpackPlugin simplifies creation of HTML files to serve your webpack bundles.*
 
 `npm i -D webpack-dev-server html-webpack-plugin`
 
-Then in root create 'webpack.config.js' with:
+Then in root create 'webpack.config.js', exemple with a template call:
 
 ```` js
 const HTMLPlugin = require('html-webpack-plugin')
 
 module.exports = {
- plugins: [
-  new HTMLPlugin()
- ]
+  plugins: [
+    new HTMLPlugin({
+      hash: true,
+      title: 'My Awesome application',
+      myPageHeader: 'Hello World',
+      template: './src/template.html',
+      filename: './index.html' //relative to root of the application
+    })
+  ]
 }
 ````
 
-In 'package.json':
+In 'package.json, for instance with 'start':
 
 ````json
   "scripts": {
@@ -171,7 +359,27 @@ In 'package.json':
   },
 ````
 
-then: `npm run dev` / http://localhost:8080/ 
+Exemple of template.html
+
+````html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+
+  <body>
+    <h1> <%= htmlWebpackPlugin.options.myPageHeader %> </h1>
+    <h3>Welcome to the Awesome application</h3>
+
+    <my-app></my-app>
+
+  </body>
+</html>
+````
+
+then: `npm run start` / http://localhost:8080/ 
 
 
 
@@ -202,6 +410,12 @@ then: `npm run dev` / http://localhost:8080/
 [Devtool](https://webpack.js.org/configuration/devtool/)
 
 [What are Javascript Source Maps?](https://blog.rapid7.com/2017/05/24/what-are-javascript-source-maps/)
+
+[using html-webpack-plugin to generate index.html](https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474)
+
+[PostCSS Preset Env: Babel for CSS](https://dev.to/adrianbdesigns/postcss-preset-env-babel-for-css-12hp)
+
+[npm-install](https://docs.npmjs.com/cli/install)
 
 [Comprendre WebAssembly en 5 minutes](https://www.jesuisundev.com/comprendre-webassembly-en-5-minutes/)
 

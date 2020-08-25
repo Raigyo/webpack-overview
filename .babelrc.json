@@ -2,7 +2,9 @@
 	"presets": [
 		["@babel/preset-env", {
 			"useBuiltIns": "entry",
+			"modules": false,
 			"debug":true
 		}]
-	]
+	],
+	"plugins": ["syntax-dynamic-import"]
 }
