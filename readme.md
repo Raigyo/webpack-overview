@@ -153,16 +153,16 @@ npm install --save  @babel/polyfill
 
 webpack.config.js
 
-````json
+````js
 module.exports = {
-  	module: {
-		rules: [{
-			test: /\.js$/,
-			exclude: /node_modules/,
-			use: {
-				loader: 'babel-loader',
-			}
-		}]
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /node_modules/,
+      use: {
+        loader: 'babel-loader',
+      }
+    }]
   }
 }
 ````
@@ -227,7 +227,7 @@ index.js, import scss
 import css from './app.scss'
 ````
 
-SCSS will be automaticaly conver tinto CSS.
+SCSS will be automaticaly converted into CSS.
 
 #### Postprocessor CSS (PostCSS): [postcss-loader](https://webpack.js.org/loaders/postcss-loader/)
 
