@@ -179,7 +179,7 @@ module.exports = {
 }
 ````
 
-#### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/), [postcss-loader](https://webpack.js.org/loaders/postcss-loader/)
+#### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/)
 
 **Css loader**: convert css to strings
 
