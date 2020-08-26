@@ -86,7 +86,7 @@ Use this plugin for dynamic imports:
 
 `npm i -D babel-plugin-syntax-dynamic-import`
 
-In .babelrc.json:
+In **.babelrc.json**:
 
 ````json
 {
@@ -103,7 +103,7 @@ In .babelrc.json:
 
 Exemple with an external component displaying a console log:
 
-index.js
+**index.js**
 
 ````js
 document.getElementById('button').addEventListener('click', function () {
@@ -115,7 +115,7 @@ document.getElementById('button').addEventListener('click', function () {
 })
 ````
 
-print.js
+**print.js**
 
 ````
 console.log('The print.js module has loaded! See the network tab in dev tools...');
@@ -125,7 +125,7 @@ export default () => {
 };
 ````
 
-Another exemple that display Web Assembly in client console:
+Another exemple that display Web Assembly in client console, in **index.js**:
 
 ````js
 import('./test.wasm').then(function (module) {
@@ -134,7 +134,9 @@ import('./test.wasm').then(function (module) {
 }).catch(console.log)
 ````
 
+### Mode dev and prod
 
+...
 
 ## Packages
 
@@ -151,7 +153,7 @@ npm install --save-dev @babel/core @babel/register @babel/preset-env babel-loade
 npm install --save  @babel/polyfill
 ````
 
-webpack.config.js
+**webpack.config.js**
 
 ````js
 module.exports = {
@@ -166,7 +168,7 @@ module.exports = {
   }
 }
 ````
-.babelrc.json
+**.babelrc.json**
 
 ````json
 {
@@ -181,19 +183,19 @@ module.exports = {
 
 #### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/)
 
-**Css loader**: convert css to strings
+**Css loader**: *convert css to strings*
 
 `npm install --save-dev css-loader`
 
-**Style loader**: inject strings into style tags
+**Style loader**: *inject strings into style tags*
 
 `npm install --save-dev style-loader`
 
-**Sass loader** and node-sass: to use css preprocessor, here sass to css
+**Sass loader** and node-sass: *to use css preprocessor, here sass to css*
 
 `npm install --save-dev sass-loader node-sass`
 
-webpack.config.js
+**webpack.config.js**
 
 ````js
 	module: {
@@ -211,7 +213,7 @@ webpack.config.js
   }
 ````
 
-app.scss
+**app.scss**
 
 ````scss
 $background: #DDD;
@@ -221,7 +223,7 @@ body {
 }
 ````
 
-index.js, import scss
+**index.js**, import scss
 
 ````js
 import css from './app.scss'
@@ -231,7 +233,7 @@ SCSS will be automaticaly converted into CSS.
 
 #### Postprocessor CSS (PostCSS): [postcss-loader](https://webpack.js.org/loaders/postcss-loader/)
 
-**PostCSS loader** : a CSS post-processing tool that can transform your CSS in a lot of  ways, like autoprefixing, linting and more!
+**PostCSS loader** : *a CSS post-processing tool that can transform your CSS in a lot of  ways, like autoprefixing, linting and more!*
 
 `npm i -D postcss-loader`
 
@@ -243,7 +245,7 @@ postcss-preset-env: `npm i postcss-preset-env`
 
 css nano: `npm i cssnano`
 
-webpack.config.js
+**webpack.config.js**
 
 ````js
       {
@@ -273,18 +275,18 @@ webpack.config.js
 
 or with an external config file:
 
-webpack.config.js
+**webpack.config.js**
 
-````
+````js
       {
         test: /\.scss$/i,
         use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
       }
 ````
 
-postcss.config.js
+**postcss.config.js**
 
-````
+````js
 module.exports = {
   plugins: {
     'postcss-preset-env': {
@@ -329,7 +331,7 @@ Warning: [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack
 
 `npm i -D webpack-dev-server html-webpack-plugin`
 
-Then in root create 'webpack.config.js', exemple with a template call:
+**webpack.config.js**, exemple with a template call:
 
 ```` js
 const HTMLPlugin = require('html-webpack-plugin')
@@ -347,7 +349,7 @@ module.exports = {
 }
 ````
 
-In 'package.json, for instance with 'start':
+In **package.json**, for instance with 'start':
 
 ````json
   "scripts": {
@@ -359,7 +361,7 @@ In 'package.json, for instance with 'start':
   },
 ````
 
-Exemple of template.html
+Exemple of **template.html**
 
 ````html
 <!DOCTYPE html>
@@ -381,19 +383,49 @@ Exemple of template.html
 
 then: `npm run start` / http://localhost:8080/ 
 
+#### [MiniCssExtractPlugin](https://webpack.js.org/plugins/mini-css-extract-plugin/)
+
+*This plugin extracts CSS into separate files. It creates a CSS file per JS file which contains CSS. It supports On-Demand-Loading of CSS and SourceMaps.*
+
+`npm install --save-dev mini-css-extract-plugin`
 
 
 
+**webpack.config.js**
 
+```js
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+module.exports = {
+  plugins: [new MiniCssExtractPlugin()],
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+    ],
+  },
+};
+```
+
+#### [ExtractTextWebpackPlugin](https://webpack.js.org/plugins/extract-text-webpack-plugin/)
+
+*Extract text from a bundle, or bundles, into a separate file.*
+
+`npm i extract-text-webpack-plugin@next`
 
 
 
 ## Useful links
 
+[Webpack 4: comprendre webpack](https://www.grafikart.fr/tutoriels/webpack-4-992)
+
 [Webpack](https://webpack.js.org/)
 
 [What is Webpack and why should I care?](https://medium.com/the-self-taught-programmer/what-is-webpack-and-why-should-i-care-part-1-introduction-ca4da7d0d8dc)
+
+[Webpack 4: mode and optimization](https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a)
 
 [Modularize Your JavaScript with ES6 Modules and Webpack](https://ericslenk.com/modularize-your-javascript-with-es6-modules-and-webpack.html)
 

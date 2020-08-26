@@ -1,24 +1,2 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[1],{
-
-/***/ "./src/test.wasm":
-/*!***********************!*\
-  !*** ./src/test.wasm ***!
-  \***********************/
-/*! exports provided: memory, _Z5add42i */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-// Instantiate WebAssembly module
-var wasmExports = __webpack_require__.w[module.i];
-__webpack_require__.r(exports);
-// export exports from WebAssembly module
-for(var name in wasmExports) if(name != "__webpack_init__") exports[name] = wasmExports[name];
-// exec imports from WebAssembly module (for esm order)
-
-
-// exec wasm module
-wasmExports["__webpack_init__"]()
-
-/***/ })
-
-}]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{38:function(e,o,t){"use strict";t.r(o),t(7),console.log("The print.js module has loaded! See the network tab in dev tools..."),o.default=()=>{console.log('Button Clicked: Here\'s "some text"!')}}}]);
+//# sourceMappingURL=1.bundle.js.map

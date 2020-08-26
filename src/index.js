@@ -4,7 +4,7 @@ import config from './config';//use relative path otherwise it will link to node
 import '@babel/polyfill';
 //import css from './app.css';
 import css from './app.scss';
-
+console.log("process env: ", process.env.NODE_ENV);
 
 //Import of a json+use of an imported module (config json)
 log(hello(config.name));// Output: Hello Vincent
