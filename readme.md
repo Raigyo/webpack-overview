@@ -9,6 +9,7 @@
 > Webpack allows you to break up and modulate Javascript.
 
 
+![Webpack logo](./src/css/webpack-logo-horizontal.png)
 
 [Webpack](https://webpack.js.org/) is a **module builder**. This is important to understand, as Webpack does not run **during** your page, it runs during your development.
 
@@ -292,10 +293,6 @@ module.exports = {
 ````
 
 
-
-
-
-## Techniques
 
 ## Packages
 
@@ -619,14 +616,6 @@ plugins: [
     new OptimizeCSSAssetsPlugin({})
  ],//\plugins
 ````
-
-
-
-#### [ExtractTextWebpackPlugin](https://webpack.js.org/plugins/extract-text-webpack-plugin/)
-
-*Extract text from a bundle, or bundles, into a separate file.*
-
-`npm i extract-text-webpack-plugin@next`
 
 
 
