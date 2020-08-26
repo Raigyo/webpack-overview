@@ -16,4 +16,20 @@ module.exports = {
         filename: './index.html' //relative to root of the application
       })
     ],
+    module: {
+      rules: [
+        {
+          test: /\.(png|jpg|gif)$/i,
+          use: [
+            {
+              loader: 'url-loader',
+              options: {
+                limit: 8192,
+                name: '[name].[hash:7].[ext]'
+              },
+            },
+          ],
+        },
+      ],
+    },
 };

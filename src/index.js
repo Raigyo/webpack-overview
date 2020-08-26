@@ -2,9 +2,6 @@
 import {log, hello} from './log';//destructuring
 import config from './config';//use relative path otherwise it will link to node modules
 import '@babel/polyfill';
-//import css from './app.css';
-//import css from './app.scss';
-console.log("process env: ", process.env.NODE_ENV);
 
 //Display environment on html template
 const displayEnv = String(process.env.NODE_ENV);
@@ -35,5 +32,3 @@ let a = "people!"
 log(hello(a))// Output: Hello people!
 let [b,,c] = [1,2,4,5]
 log(b);// Output: 1
-
-

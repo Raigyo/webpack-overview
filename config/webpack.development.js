@@ -7,7 +7,6 @@ module.exports = {
 	output: {
     path: path.resolve(__dirname, '..', "dist"),
     filename: '[name].js',
-    publicPath: '/dist/'
   },
   devtool: "eval-cheap-module-source-map",
   plugins: [

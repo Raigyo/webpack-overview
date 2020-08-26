@@ -13,7 +13,6 @@ module.exports = {
     path: path.resolve(__dirname, '..', "build"),
     filename: '[name].[chunkhash:8].js',
     //Cache invalidation can be achieved by including a hash to the filenames
-    publicPath: '/build/'
   },
   devtool: "source-map",
   plugins: [

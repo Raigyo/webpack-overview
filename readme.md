@@ -457,7 +457,15 @@ module.exports = {
 };
 ````
 
+#### [url-loader](https://webpack.js.org/loaders/url-loader/) and [file-loader](https://webpack.js.org/loaders/file-loader/)
 
+**url-loader**: *A loader for webpack which transforms files into base64 URIs.* 
+
+**file-loader**: *The file-loader resolves import/require() on a file into a url and emits the file into the output directory.*
+
+`npm install url-loader --save-dev`
+
+`npm install file-loader --save-dev`
 
 ### Plugins
 
