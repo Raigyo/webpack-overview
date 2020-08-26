@@ -3,7 +3,7 @@ import {log, hello} from './log';//destructuring
 import config from './config';//use relative path otherwise it will link to node modules
 import '@babel/polyfill';
 //import css from './app.css';
-import css from './app.scss';
+//import css from './app.scss';
 console.log("process env: ", process.env.NODE_ENV);
 
 //Display environment on html template

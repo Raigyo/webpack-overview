@@ -16,6 +16,20 @@ Webpack is a tool wherein you use a **configuration to explain** to the builder 
 
 Webpack permet de morceler et de moduler Javascript.
 
+## Concepts covered
+
+- Configuration
+- Dev mode / prod mode (new in Webpack 4)
+- webpack.config.js (several files: common, dev and prod)
+- Lazy Loading / Code splitting
+- Minification
+- Babel
+- CSS, Sass, CSS extraction
+- Caching
+- Url Loader
+- Eslint
+- Dev Server
+
 ## Install Webpack
 
 ### Init project
@@ -136,7 +150,152 @@ import('./test.wasm').then(function (module) {
 
 ### Mode dev and prod
 
-...
+Providing the `mode` configuration option tells webpack to use its built-in optimizations accordingly.
+
+It's new in Webpack 4. So webpack provides a preconfiguration for testing and building.
+
+```
+string = 'production': 'none' | 'development' | 'production'
+```
+
+**package.json**
+
+````json
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "prod": "webpack --mode=production",
+    "serve:dev": "webpack-dev-server --open --mode=development",
+    "serve:prod": "webpack-dev-server --open --mode=production"
+  },
+````
+
+We can still use a *webpack.config.js* file. 
+
+Here is an exemple with several configs according to the mode dev or prod, with a common part.
+
+```diff
+ webpack-demo
+  |- package.json
+  |- webpack.config.js
++ |- index.html
++ |- /config
++   |- webpack.common.js
++   |- webpack.development.js
++   |- webpack.production.js
++ |- /build (prod)
++   |- main.js
++ |- /dist (dev)
++   |- main.js
++ |- /src
++   |- index.js
+```
+
+**webpack.config.js**
+
+````js
+const { merge } = require('webpack-merge');
+const commonConfig = require('./config/webpack.common');
+
+module.exports = (env, options) => {
+  const config = require(`./config/webpack.${options.mode}`);
+  return merge(commonConfig, config);
+};
+````
+
+**config/webpack.common.js**
+
+````js
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+    entry: {
+        main: ['./src/css/app.scss', './src/index.js']
+        //the entry is the name given to the files in build, here 'main'
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        hash: true,
+        title: 'Webpack overview',
+        myPageHeader: 'Webpack overview',
+        myEnv: 'Webpack environment: ',
+        template: './src/template.html',
+        filename: './index.html' //relative to root of the application
+      })
+    ],
+};
+````
+
+**config/webpack.development.js**
+
+````js
+const path = require("path");
+
+//Configuration
+module.exports = {
+  watch: true,
+  mode: 'development',
+	output: {
+    path: path.resolve(__dirname, '..', "dist"),
+    filename: '[name].js',
+    publicPath: '/dist/'
+  },
+  devtool: "eval-cheap-module-source-map",
+  plugins: [
+
+  ],//\plugins*/
+	module: {
+        rules: [
+    	//...
+        ]//\rules
+  }//\modules
+}//\module export
+
+
+````
+
+**config/webpack.production.js**
+
+````js
+const path = require("path");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+//...
+
+//Configuration
+module.exports = {
+  watch: true,
+  mode: 'production',
+	output: {
+    path: path.resolve(__dirname, '..', "build"),
+    filename: '[name].[chunkhash:8].js',
+    //Cache invalidation can be achieved by including a hash to the filenames
+    publicPath: '/build/'
+  },
+  devtool: "source-map",
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash:8].css',
+      chunkFilename: '[id].css',
+    }),
+    new TerserPlugin({
+      sourceMap: true
+    }),
+	//...
+  ],//\plugins
+	module: {
+        rules: [
+          //..
+        ]//\rules
+  }//\modules
+}//\module export
+````
+
+
+
+
+
+## Techniques
 
 ## Packages
 
@@ -510,7 +669,10 @@ plugins: [
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 plugins: [
-    new CleanWebpackPlugin(['directoryName1','directoryName2']),
+     new CleanWebpackPlugin({
+      verbose: true,//log
+      dry: false// true = test without delete, false = delete
+    })
  ],//\plugins
 ````
 

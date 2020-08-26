@@ -26,10 +26,9 @@ module.exports = {
     }),
     new OptimizeCSSAssetsPlugin({}),
     new ManifestPlugin(),
-    new CleanWebpackPlugin(['build'], {
-      root: path.resolve('./'),
-      verbose: true,
-      dry: true
+    new CleanWebpackPlugin({
+      verbose: true,//log
+      dry: false// true = test without delete, false = delete
     })
   ],//\plugins
 	module: {

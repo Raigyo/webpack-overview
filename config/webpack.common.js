@@ -3,7 +3,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        main: './src/index.js'
+        main: ['./src/css/app.scss', './src/index.js']
+        //the entry is the name given to the files in build, here 'main'
     },
     plugins: [
       new HtmlWebpackPlugin({
