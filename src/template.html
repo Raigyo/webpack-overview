@@ -7,8 +7,9 @@
 
   <body>
     <h1> <%= htmlWebpackPlugin.options.myPageHeader %> </h1>
-    <h3>Welcome to the Awesome application</h3>
-    <button class="btn btn-primary" id="button">Click here</button>
+    <h3>Check console using F12</h3>
+    <p><strong><%= htmlWebpackPlugin.options.myEnv %><span id="display-env"></span></strong></p>
+    <button class="btn btn-primary" id="button">Click here to load async print module</button>
 
     <my-app></my-app>
 

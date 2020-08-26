@@ -1,2 +1,2 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{38:function(e,o,t){"use strict";t.r(o),t(7),console.log("The print.js module has loaded! See the network tab in dev tools..."),o.default=()=>{console.log('Button Clicked: Here\'s "some text"!')}}}]);
+(window.webpackJsonp=window.webpackJsonp||[]).push([[1],{38:function(o,e,n){"use strict";n.r(e),n(7),console.log("The print.js module has loaded! See the network tab in dev tools..."),e.default=()=>{console.log("Button Clicked!")}}}]);
 //# sourceMappingURL=1.bundle.js.map

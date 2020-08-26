@@ -6,6 +6,10 @@ import '@babel/polyfill';
 import css from './app.scss';
 console.log("process env: ", process.env.NODE_ENV);
 
+//Display environment on html template
+const displayEnv = String(process.env.NODE_ENV);
+document.querySelector("#display-env").innerHTML = displayEnv;
+
 //Import of a json+use of an imported module (config json)
 log(hello(config.name));// Output: Hello Vincent
 log("config.cache: "+config.cache); // Output: config.cache:true
@@ -32,4 +36,4 @@ log(hello(a))// Output: Hello people!
 let [b,,c] = [1,2,4,5]
 log(b);// Output: 1
 
-//Sass
+

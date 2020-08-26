@@ -8,8 +8,9 @@ module.exports = {
     plugins: [
       new HtmlWebpackPlugin({
         hash: true,
-        title: 'My Awesome application',
-        myPageHeader: 'Hello World',
+        title: 'Webpack overview',
+        myPageHeader: 'Webpack overview',
+        myEnv: 'Webpack environment: ',
         template: './src/template.html',
         filename: './index.html' //relative to root of the application
       })
