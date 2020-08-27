@@ -2,6 +2,7 @@
 import {log, hello} from './log';//destructuring
 import config from './config';//use relative path otherwise it will link to node modules
 import '@babel/polyfill';
+import webpackLogo from '../src/css/webpack-logo-horizontal.png';
 
 //Display environment on html template
 const displayEnv = String(process.env.NODE_ENV);
@@ -26,6 +27,10 @@ import('./test.wasm').then(function (module) {
   //wasm script to add a number to 42
  log(module._Z5add42i(20))// Output: 62
 }).catch(console.log)
+
+//Path to an imported file
+//here: import webpackLogo from '../css/webpack-logo-horizontal.png';
+log(webpackLogo);
 
 //Exemple of Babel converting let to var in main.js
 let a = "people!"

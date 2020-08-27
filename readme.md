@@ -15,7 +15,7 @@
 
 Webpack is a tool wherein you use a **configuration to explain** to the builder **how to load specific things**. You describe to Webpack how to load `*.js` files, or how it should look at `.scss` files, etc. Then, when you run it, it goes into your entry point and walks up and down your program and figures out **exactly** what it needs, in what order it needs it, and what each piece depends on. It will then create **bundles** — as few as possible, as optimized as possible, that you include as the scripts in your application.
 
-Webpack permet de morceler et de moduler Javascript.
+So Webpack allows you to break up and modulate Javascript.
 
 ## Concepts covered
 
@@ -93,63 +93,7 @@ Will create a 'dist' folder:
 
 ## Techniques
 
-#### Lazy Loading / Code splitting
-
-Allows deferred loading for some file to improve performances or if we don't always need a component. This practice essentially involves splitting your code at logical breakpoints, and then loading it once the user has done something that requires, or will require, a new block of code. This speeds up the initial load of the application and lightens its overall weight as some blocks may never even be loaded.
-
-Use this plugin for dynamic imports:
-
-`npm i -D babel-plugin-syntax-dynamic-import`
-
-In **.babelrc.json**:
-
-````json
-{
-	"presets": [
-		["@babel/preset-env", {
-			"useBuiltIns": "entry",
-			"modules": false,
-			"debug":true
-		}]
-	],
-	"plugins": ["syntax-dynamic-import"]
-}
-````
-
-Exemple with an external component displaying a console log:
-
-**index.js**
-
-````js
-document.getElementById('button').addEventListener('click', function () {
-  //Async promise
-  import('./print').then(module => {
-  const print = module.default;
-  print();
-  })
-})
-````
-
-**print.js**
-
-````
-console.log('The print.js module has loaded! See the network tab in dev tools...');
-
-export default () => {
-  console.log('Button Clicked: Here\'s "some text"!');
-};
-````
-
-Another exemple that display Web Assembly in client console, in **index.js**:
-
-````js
-import('./test.wasm').then(function (module) {
-  //wasm script to add a number to 42
- log(module._Z5add42i(20))// Output: 62
-}).catch(console.log)
-````
-
-### Mode dev and prod
+### [Mode dev and prod](https://webpack.js.org/configuration/mode/)
 
 Providing the `mode` configuration option tells webpack to use its built-in optimizations accordingly.
 
@@ -238,8 +182,7 @@ module.exports = {
   mode: 'development',
 	output: {
     path: path.resolve(__dirname, '..', "dist"),
-    filename: '[name].js',
-    publicPath: '/dist/'
+    filename: '[name].js'
   },
   devtool: "eval-cheap-module-source-map",
   plugins: [
@@ -269,9 +212,8 @@ module.exports = {
   mode: 'production',
 	output: {
     path: path.resolve(__dirname, '..', "build"),
-    filename: '[name].[chunkhash:8].js',
+    filename: '[name].[chunkhash:8].js'
     //Cache invalidation can be achieved by including a hash to the filenames
-    publicPath: '/build/'
   },
   devtool: "source-map",
   plugins: [
@@ -292,7 +234,138 @@ module.exports = {
 }//\module export
 ````
 
+It's also possible to use only one config file using conditionnals to filter what is applied on dev or prod.
 
+**package.json**
+
+````json
+  "scripts": {
+    "dev": "NODE_ENV=dev webpack",
+    "start": "webpack-dev-server --open",
+    "prod": "webpack"
+  },
+````
+
+**webpack.config.js**
+
+````js
+const path = require("path");
+const TerserPlugin = require('terser-webpack-plugin');
+const dev = process.env.NODE_ENV === "dev";
+
+let cssLoaders = [
+  'style-loader',
+  'css-loader'
+]
+//Only use postcss-loader in production
+if (!dev) {
+  cssLoaders.push({
+    loader: 'postcss-loader'
+  })
+}
+
+//Configuration
+let config = {
+  entry: './src/index.js',
+  watch: dev,
+  mode: 'development',
+	output: {
+    path: path.resolve(__dirname, "build"),
+    filename: 'bundle.js'
+  },
+  //Ternary operator to filter the way to use of TerserPlugin
+  devtool: dev ? "eval-cheap-module-source-map" : "source-map",
+  plugins: [
+   //**
+  ],//\plugins
+	module: {
+		rules: [
+          {//CSS used in dev mode
+            test: /\.css$/i,
+            sideEffects: true,
+            use: cssLoaders
+          },
+          {//SASS used in prod mode
+            test: /\.scss$/i,
+            sideEffects: true,
+            use: [
+              ...cssLoaders,
+              'sass-loader'
+            ]
+          }
+    	]//\rules
+  	}//\modules
+}//\config
+
+//Only use TerserPlugin (source map plugin) in production
+if (!dev) {
+  config.plugins.push(new TerserPlugin({
+    sourceMap: true
+  }))
+}
+
+module.exports = config;
+````
+
+#### [Lazy Loading](https://webpack.js.org/guides/lazy-loading/) / [Code splitting](https://webpack.js.org/guides/code-splitting/)
+
+Allows deferred loading for some file to improve performances or if we don't always need a component. This practice essentially involves splitting your code at logical breakpoints, and then loading it once the user has done something that requires, or will require, a new block of code. This speeds up the initial load of the application and lightens its overall weight as some blocks may never even be loaded.
+
+Use this plugin for dynamic imports:
+
+`npm i -D babel-plugin-syntax-dynamic-import`
+
+In **.babelrc.json**:
+
+````json
+{
+	"presets": [
+		["@babel/preset-env", {
+			"useBuiltIns": "entry",
+			"modules": false,
+			"debug":true
+		}]
+	],
+	"plugins": ["syntax-dynamic-import"]
+}
+````
+
+Exemple with an external component displaying a console log:
+
+**index.js**
+
+````js
+document.getElementById('button').addEventListener('click', function () {
+  //Async promise
+  import('./print').then(module => {
+  const print = module.default;
+  print();
+  })
+})
+````
+
+**print.js**
+
+````
+console.log('The print.js module has loaded! See the network tab in dev tools...');
+
+export default () => {
+  console.log('Button Clicked: Here\'s "some text"!');
+};
+````
+
+Another exemple that display Web Assembly in client console, in **index.js**:
+
+````js
+import('./test.wasm').then(function (module) {
+  //wasm script to add a number to 42
+ log(module._Z5add42i(20))// Output: 62
+}).catch(console.log)
+````
+
+### [Resolve / Aliases](https://webpack.js.org/configuration/resolve/)
+
+**Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.** 
 
 ## Packages
 
@@ -493,11 +566,9 @@ module.exports = {
  }
 ````
 
+In the browser, disable '**Enable JS source maps**'.
 
-
-In th browser, disable 'Enable JS source maps'.
-
-Then we can use `console.log` and `debugge` even with the minified build files.
+Then we can use `console.log` and `debugger` even with the minified build files.
 
 Warning: [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/) is deprecated
 
@@ -673,6 +744,102 @@ plugins: [
  ],//\plugins
 ````
 
+#### [url-loader](https://webpack.js.org/loaders/url-loader/), [file-loader](https://webpack.js.org/loaders/file-loader/), [img-loader](https://www.npmjs.com/package/img-loader), [raw-loader](https://webpack.js.org/loaders/raw-loader/)
+
+**url-loader**: *A loader for webpack which transforms files into base64 URIs.*
+
+` npm install url-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+ {
+     test: /\.(jpe?g|png|gif|svg)$/i,
+         use: [
+             {
+                 loader: 'url-loader',//base 64 conversion
+                 options: {
+                     limit: 8192,//beyond the limit it will use 'file-loader' by default
+                     name: '[name].[hash:7].[ext]'
+                 },
+             },
+         ],
+ },
+````
+
+**file-loader**: *The file-loader resolves import/require() on a file into a url and emits the file into the output directory.*
+
+`npm install file-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+{
+    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
+    loader: 'file-loader'
+},
+````
+
+**img-loader**: *Image minimizing loader for webpack 4, meant to be used with url-loader, file-loader, or raw-loader.*
+
+`npm install img-loader --save-dev`
+
+img-loader can be used with a combination of other plugins, for instance imagemin:
+
+[imagemin](https://www.npmjs.com/package/imagemin): `npm install imagemin`
+
+[imagemin-mozjpeg](https://www.npmjs.com/package/imagemin-mozjpeg): `npm install imagemin-mozjpeg`
+
+[imagemin-gifsicle](https://www.npmjs.com/package/imagemin-gifsicle): `npm install imagemin-gifsicle` (if problem during install use: `npm install imagemin-gifsicle@6.0.1`)
+
+[imagemin-pngquant](https://www.npmjs.com/package/imagemin-pngquant): `npm install imagemin-pngquant`
+
+[imagemin-svgo](https://www.npmjs.com/package/imagemin-svgo): `npm install imagemin-svgo`
+
+[imagemin-webp](https://www.npmjs.com/package/imagemin-webp): `npm install imagemin-webp`
+
+**webpack.config.js**
+
+````js
+ {
+     test: /\.(jpe?g|png|gif|svg)$/i,
+         use: [
+             {
+                 loader: 'img-loader',
+                 options: {
+                     plugins: [
+                         require('imagemin-pngquant')({
+                             floyd: 0.5,
+                             speed: 2
+                         }),
+                     ]
+                 }
+             }
+         ],
+ },
+````
+
+**raw-loader**: *A loader for webpack that allows importing files as a String.*
+
+`npm install raw-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.txt$/i,
+        use: 'raw-loader',
+      },
+    ],
+  },
+};
+````
+
+
+
 
 
 ## Useful links
@@ -706,6 +873,8 @@ plugins: [
 [using html-webpack-plugin to generate index.html](https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474)
 
 [PostCSS Preset Env: Babel for CSS](https://dev.to/adrianbdesigns/postcss-preset-env-babel-for-css-12hp)
+
+[imagemin](https://github.com/imagemin)
 
 [npm-install](https://docs.npmjs.com/cli/install)
 
