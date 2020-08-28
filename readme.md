@@ -1,7 +1,3 @@
-
-
-
-
 # Webpack 4
 
 > 🔨 Webpack overview. From Grafikart.fr '[Comprendre Webpack](https://www.youtube.com/watch?v=_KXGVca8uXw&list=PLjwdMgw5TTLVzGXGxEBdjwHXCeYnBb7n8)'. The training was for version 3 but has been updated for version 4 using documentation.
@@ -28,6 +24,7 @@ So Webpack allows you to break up and modulate Javascript.
 - CSS, Sass, CSS extraction
 - Caching
 - Url Loader
+- Resolve / Aliases
 - Eslint
 - Dev Server
 
@@ -363,9 +360,55 @@ import('./test.wasm').then(function (module) {
 }).catch(console.log)
 ````
 
-### [Resolve / Aliases](https://webpack.js.org/configuration/resolve/)
+### [Module Resolution](https://webpack.js.org/concepts/module-resolution/), [Resolve (Aliases)](https://webpack.js.org/configuration/resolve/)
 
-**Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.** 
+A resolver is a library which helps in locating a module by its absolute path. A module can be required as a dependency from another module as:
+
+```js
+import foo from 'path/to/module';
+// or
+require('path/to/module');
+```
+
+The dependency module can be from the application code or a third-party library. The resolver helps webpack find the module code that needs to be included in the bundle for every such `require`/`import` statement. webpack uses [enhanced-resolve](https://github.com/webpack/enhanced-resolve) to resolve file paths while bundling modules.
+
+`npm install enhanced-resolve`
+
+By default webpack uses Resolve.
+
+Here an exemple to create aliases:
+
+**webpack.config.js**
+
+````js
+    resolve: {
+      alias: {
+        '@Css': path.resolve(__dirname, '../src/css/'),
+        '@Img': path.resolve(__dirname, '../src/img/')
+      }
+    },
+````
+
+**index.js**
+
+````js
+import webpackLogo from '@Css/app.scss';
+````
+
+It's important not to forget to use this alias everywhere:
+
+**app.scss**
+
+````scss
+$background: #DDD;
+
+body {
+    background: $background url(@Img/webpack-logo-horizontal.png);
+    background-size: 100% 100%;
+}
+````
+
+
 
 ## Packages
 
@@ -409,6 +452,66 @@ module.exports = {
 	]
 }
 ````
+
+#### Eslint: [eslint-loader](https://webpack.js.org/loaders/eslint-loader/)
+
+*ESLint is a tool for identifying and reporting on patterns found in ECMAScript/JavaScript code, with the goal of making code more consistent and avoiding bugs.*
+
+`npm install eslint-loader --save-dev`
+
+Note: You also need to install eslint from npm, if you haven't already:
+
+`npm install eslint --save-dev`
+
+Following plugins are also needed:
+
+[eslint-plugin-import](https://www.npmjs.com/package/eslint-plugin-import): `npm i eslint-plugin-import -D`
+
+[eslint-plugin-node](https://www.npmjs.com/package/eslint-plugin-node): `npm i eslint-plugin-node -D`
+
+[eslint-plugin-promise](https://www.npmjs.com/package/eslint-plugin-promise): `npm i eslint-plugin-promise -D`
+
+
+
+We have to load Eslint *before Babel* so for that we use the  `enforce` [property](https://webpack.js.org/configuration/module/#ruleenforce):
+
+**webpack.config.js**
+
+````js
+rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'eslint-loader',
+        }
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        }
+      },
+]
+````
+
+A config file is mandatory to make Eslint working, *.eslintrc* in the root.
+
+Let's use [JavaScript Standard Style](https://www.npmjs.com/package/eslint-config-standard):
+
+`npm install eslint-config-standard-D`
+
+**.eslintrc**
+
+````json
+{
+    "extends": "standard"
+}
+````
+
+
 
 #### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/)
 
@@ -782,6 +885,8 @@ plugins: [
 
 **img-loader**: *Image minimizing loader for webpack 4, meant to be used with url-loader, file-loader, or raw-loader.*
 
+Meant to be used with url-loader, file-loader, or raw-loader
+
 `npm install img-loader --save-dev`
 
 img-loader can be used with a combination of other plugins, for instance imagemin:
@@ -804,6 +909,7 @@ img-loader can be used with a combination of other plugins, for instance imagemi
  {
      test: /\.(jpe?g|png|gif|svg)$/i,
          use: [
+			'url-loader?limit=10000',
              {
                  loader: 'img-loader',
                  options: {
@@ -844,41 +950,37 @@ module.exports = {
 
 ## Useful links
 
-[Webpack 4: comprendre webpack](https://www.grafikart.fr/tutoriels/webpack-4-992)
+- [Webpack 4: comprendre webpack](https://www.grafikart.fr/tutoriels/webpack-4-992)
+- [Webpack](https://webpack.js.org/)
 
-[Webpack](https://webpack.js.org/)
+- [What is Webpack and why should I care?](https://medium.com/the-self-taught-programmer/what-is-webpack-and-why-should-i-care-part-1-introduction-ca4da7d0d8dc)
 
-[What is Webpack and why should I care?](https://medium.com/the-self-taught-programmer/what-is-webpack-and-why-should-i-care-part-1-introduction-ca4da7d0d8dc)
+- [Webpack 4: mode and optimization](https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a)
 
-[Webpack 4: mode and optimization](https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a)
+- [How to split dev/prod webpack configuration](https://dev.to/didof/how-to-split-dev-prod-webpack-configuration-n53)
 
-[How to split dev/prod webpack configuration](https://dev.to/didof/how-to-split-dev-prod-webpack-configuration-n53)
+- [Modularize Your JavaScript with ES6 Modules and Webpack](https://ericslenk.com/modularize-your-javascript-with-es6-modules-and-webpack.html)
+- [How to configure Webpack 4 from scratch for a basic website](https://dev.to/pixelgoo/how-to-configure-webpack-from-scratch-for-a-basic-website-46a5)
+- [Code Splitting](https://webpack.js.org/guides/code-splitting/)
+- [Débuter avec Webpack](https://www.alsacreations.com/tuto/lire/1754-debuter-avec-webpack.html)
 
-[Modularize Your JavaScript with ES6 Modules and Webpack](https://ericslenk.com/modularize-your-javascript-with-es6-modules-and-webpack.html)
+- [A mostly complete guide to webpack (2020)](https://www.valentinog.com/blog/webpack/)
 
-[Code Splitting](https://webpack.js.org/guides/code-splitting/)
+- [Les outils pour travailler côté front](https://bts-sio-formation.com/javascript/developpementfront)
+- [Working with Babel 7 and Webpack](https://www.thebasement.be/working-with-babel-7-and-webpack/)
+- [JavaScript Standard Style](https://standardjs.com/)
+- [Devtool](https://webpack.js.org/configuration/devtool/)
 
-[Débuter avec Webpack](https://www.alsacreations.com/tuto/lire/1754-debuter-avec-webpack.html)
+- [What are Javascript Source Maps?](https://blog.rapid7.com/2017/05/24/what-are-javascript-source-maps/)
 
-[A mostly complete guide to webpack (2020)](https://www.valentinog.com/blog/webpack/)
+- [using html-webpack-plugin to generate index.html](https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474)
+- [PostCSS Preset Env: Babel for CSS](https://dev.to/adrianbdesigns/postcss-preset-env-babel-for-css-12hp)
 
-[Les outils pour travailler côté front](https://bts-sio-formation.com/javascript/developpementfront)
+- [imagemin](https://github.com/imagemin)
 
-[Working with Babel 7 and Webpack](https://www.thebasement.be/working-with-babel-7-and-webpack/)
+- [npm-install](https://docs.npmjs.com/cli/install)
 
-[Devtool](https://webpack.js.org/configuration/devtool/)
-
-[What are Javascript Source Maps?](https://blog.rapid7.com/2017/05/24/what-are-javascript-source-maps/)
-
-[using html-webpack-plugin to generate index.html](https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474)
-
-[PostCSS Preset Env: Babel for CSS](https://dev.to/adrianbdesigns/postcss-preset-env-babel-for-css-12hp)
-
-[imagemin](https://github.com/imagemin)
-
-[npm-install](https://docs.npmjs.com/cli/install)
-
-[Comprendre WebAssembly en 5 minutes](https://www.jesuisundev.com/comprendre-webassembly-en-5-minutes/)
+- [Comprendre WebAssembly en 5 minutes](https://www.jesuisundev.com/comprendre-webassembly-en-5-minutes/)
 
 
 

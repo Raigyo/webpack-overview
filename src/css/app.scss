@@ -1,7 +1,7 @@
 $background: #DDD;
 
 body {
-    background: $background url(./webpack-logo-horizontal.png);
+    background: $background url(@Css/webpack-logo-horizontal.png);
     background-size: 100% 100%;
     transform: translateX(20px);
 }

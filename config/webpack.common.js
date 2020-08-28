@@ -6,11 +6,11 @@ module.exports = {
         main: ['./src/css/app.scss', './src/index.js']
         //the entry is the name given to the files in build, here 'main'
     },
-    /*resolve: {
+    resolve: {
       alias: {
-        css$: path.resolve('../src/css/')
+        '@Css': path.resolve(__dirname, '../src/css/')
       }
-    },*/
+    },
     plugins: [
       new HtmlWebpackPlugin({
         hash: true,
