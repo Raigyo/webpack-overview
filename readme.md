@@ -11,7 +11,7 @@
 
 Webpack is a tool wherein you use a **configuration to explain** to the builder **how to load specific things**. You describe to Webpack how to load `*.js` files, or how it should look at `.scss` files, etc. Then, when you run it, it goes into your entry point and walks up and down your program and figures out **exactly** what it needs, in what order it needs it, and what each piece depends on. It will then create **bundles** — as few as possible, as optimized as possible, that you include as the scripts in your application.
 
-So Webpack allows you to break up and modulate Javascript.
+
 
 ## Concepts covered
 
@@ -27,6 +27,8 @@ So Webpack allows you to break up and modulate Javascript.
 - Resolve / Aliases
 - Eslint
 - Dev Server
+
+
 
 ## Install Webpack
 
@@ -87,6 +89,8 @@ Will create a 'dist' folder:
 + |- /src
 +   |- index.js
 ```
+
+
 
 ## Techniques
 
@@ -304,7 +308,7 @@ if (!dev) {
 module.exports = config;
 ````
 
-#### [Lazy Loading](https://webpack.js.org/guides/lazy-loading/) / [Code splitting](https://webpack.js.org/guides/code-splitting/)
+### [Lazy Loading](https://webpack.js.org/guides/lazy-loading/) / [Code Splitting](https://webpack.js.org/guides/code-splitting/)
 
 Allows deferred loading for some file to improve performances or if we don't always need a component. This practice essentially involves splitting your code at logical breakpoints, and then loading it once the user has done something that requires, or will require, a new block of code. This speeds up the initial load of the application and lightens its overall weight as some blocks may never even be loaded.
 
@@ -327,7 +331,7 @@ In **.babelrc.json**:
 }
 ````
 
-Exemple with an external component displaying a console log:
+Exemple with an external component displaying a console log using a promise:
 
 **index.js**
 
@@ -335,15 +339,15 @@ Exemple with an external component displaying a console log:
 document.getElementById('button').addEventListener('click', function () {
   //Async promise
   import('./print').then(module => {
-  const print = module.default;
-  print();
+      const print = module.default;
+      print();
   })
 })
 ````
 
 **print.js**
 
-````
+````js
 console.log('The print.js module has loaded! See the network tab in dev tools...');
 
 export default () => {
@@ -408,15 +412,78 @@ body {
 }
 ````
 
+### DevServ: [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
+
+Use webpack with a development server that provides live reloading. **This should be used for development only**.
+
+`npm install webpack-dev-server --save-dev`
+
+**package.json**
+
+````json
+  "scripts": {
+    "serve:dev": "webpack-dev-server --open --mode=development --hot",
+    "serve:prod": "webpack-dev-server --open --mode=production"
+  },
+````
+
+The flag '--hot' enable hot reload. 
+
+The flag '--open' opens the served page in the browser.
+
+**webpack.config.js**
+
+
+````js
+
+module.exports = {
+    entry: {
+        app: ['./assets/css/app.scss', './assets/js/app.js']
+    },
+    output: {
+    	path: path.resolve(./public/assets),
+    filename: '[name].js',
+        publicPath: '/assets/'
+  },
+  devServer: {
+      contentBase: path.resolve('./public'), // path to the directory where pages are served
+      sockjsPrefix: '/assets', // use it if DevServ try to access websockets in root
+      overlay: true, //add an overlay with errors in the browser
+      // If problems with CORS (exemple if we use several domains during dev)
+      /*headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+          "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+      },*/
+      // Or we can use a proxy 
+       proxy: {
+          '/web': {// to distribute assets correctly
+            target: ''http://localhost:8000',', // launch PHP server on: 127.0.0.1:8000
+            pathRewrite: {'^/web' : ''}
+          }
+       }
+  }
+  //...
+}
+````
+
+Hot reload for specific javascript libraries/frameworks are usually provided with the CLI.
+
+The can be modified using [Hot Module Replacement](https://webpack.js.org/guides/hot-module-replacement/).
+
+Dev server can be used with the html using [html-webpack-plugin](https://webpack.js.org/plugins/html-webpack-plugin/) (cfr. infra in plugins section).
+
+Dev server allows custom setup using [webpack-dev-middleware](https://webpack.js.org/guides/development/#using-webpack-dev-middleware).
+
 
 
 ## Packages
 
-### Modules / Loaders
+### Loaders
 
 Webpack enables use of [loaders](https://webpack.js.org/loaders/) to preprocess files. This allows you to bundle any static resource way beyond JavaScript. 
 
-#### Babel: [babel-loader](https://webpack.js.org/loaders/babel-loader/)
+#### Babel: [BabelLoader](https://webpack.js.org/loaders/babel-loader/)
 
 *Babel is a toolchain that is mainly used to convert ECMAScript 2015+ code (ex: JSX) into a backwards compatible version of JavaScript (vanilla) in current and older browsers or environments.*
 
@@ -453,7 +520,7 @@ module.exports = {
 }
 ````
 
-#### Eslint: [eslint-loader](https://webpack.js.org/loaders/eslint-loader/)
+#### Eslint: [EslintLoader](https://webpack.js.org/loaders/eslint-loader/)
 
 *ESLint is a tool for identifying and reporting on patterns found in ECMAScript/JavaScript code, with the goal of making code more consistent and avoiding bugs.*
 
@@ -463,7 +530,7 @@ Note: You also need to install eslint from npm, if you haven't already:
 
 `npm install eslint --save-dev`
 
-Following plugins are also needed:
+Following plugins/dependencies are also needed:
 
 [eslint-plugin-import](https://www.npmjs.com/package/eslint-plugin-import): `npm i eslint-plugin-import -D`
 
@@ -471,7 +538,7 @@ Following plugins are also needed:
 
 [eslint-plugin-promise](https://www.npmjs.com/package/eslint-plugin-promise): `npm i eslint-plugin-promise -D`
 
-
+[eslint-plugin-standard](https://www.npmjs.com/package/eslint-plugin-standard): `npm i eslint-plugin-standard -D`
 
 We have to load Eslint *before Babel* so for that we use the  `enforce` [property](https://webpack.js.org/configuration/module/#ruleenforce):
 
@@ -497,6 +564,14 @@ rules: [
 ]
 ````
 
+It's possible to add autofix in the config file, buts it's **not advised**. It's better to correct the errors by hand and learn to avoid them when coding.
+
+````js
+options: {
+          fix: true,
+        },
+````
+
 A config file is mandatory to make Eslint working, *.eslintrc* in the root.
 
 Let's use [JavaScript Standard Style](https://www.npmjs.com/package/eslint-config-standard):
@@ -511,19 +586,17 @@ Let's use [JavaScript Standard Style](https://www.npmjs.com/package/eslint-confi
 }
 ````
 
+#### Preprocessor CSS (SASS): [CssLoader](https://webpack.js.org/loaders/css-loader/), [StyleLoader](https://webpack.js.org/loaders/style-loader/), [SassLoader](https://webpack.js.org/loaders/sass-loader/)
 
-
-#### Preprocessor CSS (SASS): [css-loader](https://webpack.js.org/loaders/css-loader/), [style-loader](https://webpack.js.org/loaders/style-loader/), [sass-loader](https://webpack.js.org/loaders/sass-loader/)
-
-**Css loader**: *convert css to strings*
+**css-loader**: *convert css to strings*
 
 `npm install --save-dev css-loader`
 
-**Style loader**: *inject strings into style tags*
+**style-loader**: *inject strings into style tags*
 
 `npm install --save-dev style-loader`
 
-**Sass loader** and node-sass: *to use css preprocessor, here sass to css*
+**sass-loader** and node-sass: *to use css preprocessor, here sass to css*
 
 `npm install --save-dev sass-loader node-sass`
 
@@ -633,15 +706,104 @@ module.exports = {
 };
 ````
 
-#### [url-loader](https://webpack.js.org/loaders/url-loader/) and [file-loader](https://webpack.js.org/loaders/file-loader/)
+#### [UrlLoader](https://webpack.js.org/loaders/url-loader/), [FileLoader](https://webpack.js.org/loaders/file-loader/), [ImgLoader](https://www.npmjs.com/package/img-loader), [RawLoader](https://webpack.js.org/loaders/raw-loader/)
 
-**url-loader**: *A loader for webpack which transforms files into base64 URIs.* 
+**url-loader**: *A loader for webpack which transforms files into base64 URIs.*
+
+` npm install url-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+ {
+     test: /\.(jpe?g|png|gif|svg)$/i,
+         use: [
+             {
+                 loader: 'url-loader',//base 64 conversion
+                 options: {
+                     limit: 8192,//beyond the limit it will use 'file-loader' by default
+                     name: '[name].[hash:7].[ext]'
+                 },
+             },
+         ],
+ },
+````
 
 **file-loader**: *The file-loader resolves import/require() on a file into a url and emits the file into the output directory.*
 
-`npm install url-loader --save-dev`
-
 `npm install file-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+{
+    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
+    loader: 'file-loader'
+},
+````
+
+**img-loader**: *Image minimizing loader for webpack 4, meant to be used with url-loader, file-loader, or raw-loader.*
+
+Meant to be used with url-loader, file-loader, or raw-loader
+
+`npm install img-loader --save-dev`
+
+img-loader can be used with a combination of other plugins, for instance imagemin:
+
+[imagemin](https://www.npmjs.com/package/imagemin): `npm install imagemin`
+
+[imagemin-mozjpeg](https://www.npmjs.com/package/imagemin-mozjpeg): `npm install imagemin-mozjpeg`
+
+[imagemin-gifsicle](https://www.npmjs.com/package/imagemin-gifsicle): `npm install imagemin-gifsicle` (if problem during install use: `npm install imagemin-gifsicle@6.0.1`)
+
+[imagemin-pngquant](https://www.npmjs.com/package/imagemin-pngquant): `npm install imagemin-pngquant`
+
+[imagemin-svgo](https://www.npmjs.com/package/imagemin-svgo): `npm install imagemin-svgo`
+
+[imagemin-webp](https://www.npmjs.com/package/imagemin-webp): `npm install imagemin-webp`
+
+**webpack.config.js**
+
+````js
+ {
+     test: /\.(jpe?g|png|gif|svg)$/i,
+         use: [
+			'url-loader?limit=10000',
+             {
+                 loader: 'img-loader',
+                 options: {
+                     plugins: [
+                         require('imagemin-pngquant')({
+                             floyd: 0.5,
+                             speed: 2
+                         }),
+                     ]
+                 }
+             }
+         ],
+ },
+````
+
+**raw-loader**: *A loader for webpack that allows importing files as a String.*
+
+`npm install raw-loader --save-dev`
+
+**webpack.config.js**
+
+````js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.txt$/i,
+        use: 'raw-loader',
+      },
+    ],
+  },
+};
+````
+
+
 
 ### Plugins
 
@@ -776,7 +938,7 @@ module.exports = {
 };
 ```
 
-#### [optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin)
+#### [OptimizeCssAssetsWebpackPlugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin)
 
 *It will search for CSS assets during the Webpack build and will optimize \ minimize the CSS (by default it uses cssnano but a custom CSS processor can be specified).*
 
@@ -799,9 +961,7 @@ plugins: [
  ],//\plugins
 ````
 
-
-
-#### [webpack-manifest-plugin](https://www.npmjs.com/package/webpack-manifest-plugin)
+#### [WebpackManifestPlugin](https://www.npmjs.com/package/webpack-manifest-plugin)
 
 *Webpack plugin for generating an asset manifest.*
 
@@ -830,7 +990,7 @@ plugins: [
 }
 ````
 
-#### [clean-webpack-plugin](https://www.npmjs.com/package/clean-webpack-plugin)
+#### [CleanWebpackPlugin](https://www.npmjs.com/package/clean-webpack-plugin)
 
 *A webpack plugin to remove/clean your build folder(s) before building again.*
 
@@ -847,139 +1007,30 @@ plugins: [
  ],//\plugins
 ````
 
-#### [url-loader](https://webpack.js.org/loaders/url-loader/), [file-loader](https://webpack.js.org/loaders/file-loader/), [img-loader](https://www.npmjs.com/package/img-loader), [raw-loader](https://webpack.js.org/loaders/raw-loader/)
-
-**url-loader**: *A loader for webpack which transforms files into base64 URIs.*
-
-` npm install url-loader --save-dev`
-
-**webpack.config.js**
-
-````js
- {
-     test: /\.(jpe?g|png|gif|svg)$/i,
-         use: [
-             {
-                 loader: 'url-loader',//base 64 conversion
-                 options: {
-                     limit: 8192,//beyond the limit it will use 'file-loader' by default
-                     name: '[name].[hash:7].[ext]'
-                 },
-             },
-         ],
- },
-````
-
-**file-loader**: *The file-loader resolves import/require() on a file into a url and emits the file into the output directory.*
-
-`npm install file-loader --save-dev`
-
-**webpack.config.js**
-
-````js
-{
-    test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
-    loader: 'file-loader'
-},
-````
-
-**img-loader**: *Image minimizing loader for webpack 4, meant to be used with url-loader, file-loader, or raw-loader.*
-
-Meant to be used with url-loader, file-loader, or raw-loader
-
-`npm install img-loader --save-dev`
-
-img-loader can be used with a combination of other plugins, for instance imagemin:
-
-[imagemin](https://www.npmjs.com/package/imagemin): `npm install imagemin`
-
-[imagemin-mozjpeg](https://www.npmjs.com/package/imagemin-mozjpeg): `npm install imagemin-mozjpeg`
-
-[imagemin-gifsicle](https://www.npmjs.com/package/imagemin-gifsicle): `npm install imagemin-gifsicle` (if problem during install use: `npm install imagemin-gifsicle@6.0.1`)
-
-[imagemin-pngquant](https://www.npmjs.com/package/imagemin-pngquant): `npm install imagemin-pngquant`
-
-[imagemin-svgo](https://www.npmjs.com/package/imagemin-svgo): `npm install imagemin-svgo`
-
-[imagemin-webp](https://www.npmjs.com/package/imagemin-webp): `npm install imagemin-webp`
-
-**webpack.config.js**
-
-````js
- {
-     test: /\.(jpe?g|png|gif|svg)$/i,
-         use: [
-			'url-loader?limit=10000',
-             {
-                 loader: 'img-loader',
-                 options: {
-                     plugins: [
-                         require('imagemin-pngquant')({
-                             floyd: 0.5,
-                             speed: 2
-                         }),
-                     ]
-                 }
-             }
-         ],
- },
-````
-
-**raw-loader**: *A loader for webpack that allows importing files as a String.*
-
-`npm install raw-loader --save-dev`
-
-**webpack.config.js**
-
-````js
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.txt$/i,
-        use: 'raw-loader',
-      },
-    ],
-  },
-};
-````
-
-
-
 
 
 ## Useful links
 
 - [Webpack 4: comprendre webpack](https://www.grafikart.fr/tutoriels/webpack-4-992)
 - [Webpack](https://webpack.js.org/)
-
 - [What is Webpack and why should I care?](https://medium.com/the-self-taught-programmer/what-is-webpack-and-why-should-i-care-part-1-introduction-ca4da7d0d8dc)
-
 - [Webpack 4: mode and optimization](https://medium.com/webpack/webpack-4-mode-and-optimization-5423a6bc597a)
-
 - [How to split dev/prod webpack configuration](https://dev.to/didof/how-to-split-dev-prod-webpack-configuration-n53)
-
 - [Modularize Your JavaScript with ES6 Modules and Webpack](https://ericslenk.com/modularize-your-javascript-with-es6-modules-and-webpack.html)
 - [How to configure Webpack 4 from scratch for a basic website](https://dev.to/pixelgoo/how-to-configure-webpack-from-scratch-for-a-basic-website-46a5)
 - [Code Splitting](https://webpack.js.org/guides/code-splitting/)
 - [Débuter avec Webpack](https://www.alsacreations.com/tuto/lire/1754-debuter-avec-webpack.html)
-
 - [A mostly complete guide to webpack (2020)](https://www.valentinog.com/blog/webpack/)
-
 - [Les outils pour travailler côté front](https://bts-sio-formation.com/javascript/developpementfront)
 - [Working with Babel 7 and Webpack](https://www.thebasement.be/working-with-babel-7-and-webpack/)
 - [JavaScript Standard Style](https://standardjs.com/)
 - [Devtool](https://webpack.js.org/configuration/devtool/)
-
 - [What are Javascript Source Maps?](https://blog.rapid7.com/2017/05/24/what-are-javascript-source-maps/)
-
 - [using html-webpack-plugin to generate index.html](https://medium.com/a-beginners-guide-for-webpack-2/index-html-using-html-webpack-plugin-85eabdb73474)
 - [PostCSS Preset Env: Babel for CSS](https://dev.to/adrianbdesigns/postcss-preset-env-babel-for-css-12hp)
-
 - [imagemin](https://github.com/imagemin)
-
 - [npm-install](https://docs.npmjs.com/cli/install)
-
+- [webpack-dev-server](https://github.com/webpack/webpack-dev-server)
 - [Comprendre WebAssembly en 5 minutes](https://www.jesuisundev.com/comprendre-webassembly-en-5-minutes/)
 
 
