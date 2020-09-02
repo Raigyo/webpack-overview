@@ -4,6 +4,9 @@
 >
 > Webpack allows you to break up and modulate Javascript.
 
+For the React version with classes see my [webpack-react-hot-reload](https://github.com/Raigyo/webpack-react-hot-reload) repository.
+
+For the React version with hooks see my [webpack-react-hot-reload-hooks](https://github.com/Raigyo/webpack-react-hot-reload-hooks) repository.
 
 ![Webpack logo](./src/css/webpack-logo-horizontal.png)
 
